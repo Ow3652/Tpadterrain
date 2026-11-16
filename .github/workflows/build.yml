@@ -1,0 +1,54 @@
+# สร้างแผ่นข้อมูลความสูงจาก Copernicus DEM แล้วเผยแพร่ขึ้น GitHub Pages
+# วิธีใช้: แท็บ Actions → "Build terrain tiles" → Run workflow
+# (ต้องตั้ง Settings → Pages → Source = GitHub Actions ไว้ก่อน)
+name: Build terrain tiles
+on:
+  workflow_dispatch:
+    inputs:
+      thr:
+        description: "สร้างซูม 12 ใต้แผ่นซูม 11 ที่สูงสุดตั้งแต่ (เมตร) — ค่ามาก = ไฟล์น้อยลง"
+        default: "300"
+      zmin:
+        description: "ซูมต่ำสุดที่สร้าง"
+        default: "5"
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: ติดตั้งเครื่องมือ
+        run: pip install rasterio numpy pillow
+      - name: ดาวน์โหลด Copernicus DEM GLO-30 (กรอบประเทศไทย)
+        run: ./download.sh dem
+      - name: สร้างแผ่นข้อมูล (Terrarium)
+        run: python build_tiles.py --src dem --out site --thr "${{ inputs.thr }}" --zmin "${{ inputs.zmin }}" | tee build.log
+      - name: ตรวจขนาด (GitHub Pages ไม่เกิน 1 GB)
+        run: |
+          cp -r static/. site/
+          MB=$(du -sm site | cut -f1)
+          { echo "## ผลการสร้าง"; echo; echo '```'; tail -1 build.log; echo '```'; echo "ขนาดหน้าเว็บรวม: ${MB} MB"; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$MB" -gt 950 ]; then echo "::error::ขนาด ${MB} MB เกินเพดาน ให้รันใหม่โดยเพิ่มค่า thr (เช่น 500)"; exit 1; fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.d.outputs.page_url }}
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,8 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tpad terrain tiles</title>
+<style>body{font-family:system-ui,sans-serif;max-width:760px;margin:24px auto;padding:0 14px;line-height:1.6;color:#222}code{background:#f3f3f3;padding:1px 4px;border-radius:3px}</style></head><body>
+<h1>ข้อมูลความสูงภูมิประเทศสำหรับ Tpad Helicopter Planner</h1>
+<p>แผ่นข้อมูลความสูงแบบ Terrarium (<code>terrarium/{z}/{x}/{y}.png</code>) ครอบคลุมกรอบประเทศไทย ซูม 5–11 ทุกพื้นที่บนบก และซูม 12 ในเขตภูเขา รายละเอียดอยู่ใน <a href="coverage.json">coverage.json</a></p>
+<p>ถอดค่า: ความสูง (เมตร) = R×256 + G + B/256 − 32768 · ย่อขนาดโดยใช้ค่าสูงสุด · แผ่นที่ไม่มีคือทะเล/ไม่มีข้อมูล</p>
+<p><b>ข้อควรระวัง:</b> Copernicus DEM เป็นแบบจำลองพื้นผิว (DSM) รวมต้นไม้และสิ่งก่อสร้างบางส่วน ไม่รวมเสา/สายไฟ ใช้ประกอบการวางแผนเท่านั้น ไม่ใช่ข้อมูลที่ผ่านการรับรองสำหรับการเดินอากาศ</p>
+<p><small>produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved</small></p>
+</body></html>
